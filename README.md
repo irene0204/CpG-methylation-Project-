@@ -1,2 +1,2 @@
-# CpG-methylation-Project-
->The goal of this project is to 
+# CpG methylation Project pipeline 
+The goal of this project is to 
