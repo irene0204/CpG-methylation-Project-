@@ -96,6 +96,7 @@ selected_features
 ```
 which contains the train and test dataframe with only the selected features, and the sample weights for train and test data. 
 
+
 **6) Model parameter tuning and model selection for each trait **
 
 We use 4 base classifiers, random forest, xgboost, logistic regression and linear_SVC. The paramters for each classifier and best combination of base classifiers are selected using the 
@@ -108,6 +109,7 @@ available in the [models](https://github.com/xsun28/CpGMethylation/tree/master/c
 * uses the train/test data (generated from 5) with 10-fold cross-validation to evaluate all possible combination of classifiers
 * calculates average AUC, F1-score, etc across all folds 
 * select the best combination of classifiers 
+
 
 **7) Predict WGBS sites for each trait **
 
