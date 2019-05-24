@@ -38,5 +38,3 @@ This step generates 8(?) HDF5 files corresponding 8 batches of CpG sites and the
 
 
 
-```python
-import pandas 
