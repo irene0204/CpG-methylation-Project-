@@ -109,9 +109,10 @@ available in the [models](https://github.com/xsun28/CpGMethylation/tree/master/c
 * uses the train/test data (generated from 5) with 10-fold cross-validation to evaluate all possible combination of classifiers
 * calculates average AUC, F1-score, etc across all folds 
 * select the best combination of classifiers 
-
+* save selected models (??????)
 
 **7) Predict WGBS sites for each trait**
+
 
 
 
