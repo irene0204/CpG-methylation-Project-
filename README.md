@@ -78,7 +78,7 @@ The feature selection process is achived by running the
 [feature_selection.py](https://github.com/xsun28/CpGMethylation/blob/master/code/features_selection/feature_selection.py) script available in the [features_selection](https://github.com/xsun28/CpGMethylation/tree/master/code/features_selection) directory, in which we:
 
 * split train/test data on 9:1 ratio and scaled the train data (?????) 
-* used rnadom forest, xgboost, logistic regression and linear_SVC to fit the train data and pick out top 100 significant features 
+* used random forest, xgboost, logistic regression and linear_SVC to fit the train data and pick out top 100 significant features 
 * rank selected features by the number of classifiers that select it (n)
 * calculate the p-values which indicates the differences of the selected features between positive sites and negative sites 
 * rank selected features first by desceding n and then by ascending p-value 
@@ -86,10 +86,33 @@ The feature selection process is achived by running the
 
 This step outputs a CSV file:
 ``` 
-
+feature_stats.csv 
 ```
+which contains information of the selected feaures, including feature name, p-value, and n
 
-**5) Feature selection for each trait**
+and a HDF5 file:
+``` 
+selected_features 
+```
+which contains the train and test dataframe with only the selected features, and the sample weights for train and test data. 
+
+**6) Model parameter tuning and model selection for each trait **
+
+We use 4 base classifiers, random forest, xgboost, logistic regression and linear_SVC. The paramters for each classifier and best combination of base classifiers are selected using the 
+
+[ModelSelectionTuning.py](https://github.com/xsun28/CpGMethylation/blob/master/code/models/ModelSelectionTuning.py) script 
+
+available in the [models](https://github.com/xsun28/CpGMethylation/tree/master/code/models) directory, which:
+
+* uses the train data (generated from 5) with 3-fold cross-validation to select the best parameters
+* uses the train/test data (generated from 5) with 10-fold cross-validation to evaluate all possible combination of classifiers
+* calculates average AUC, F1-score, etc across all folds 
+* select the best combination of classifiers 
+
+**7) Predict WGBS sites for each trait **
+
+
+
 
 
 
