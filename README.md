@@ -22,6 +22,7 @@ The following input files are needed:
 The genomic coordinates in this pipeline are in hg19. The original WGBS datasets are in hg38 and need to be converted to hg19. A CSV file containing all WGBS sites with their genomic location in hg19 can be generated using the [WGBS_allsites_preprocess.py](https://github.com/xsun28/CpGMethylation/blob/master/code/prediction/WGBS_allsites_preprocess.py) script available in the [prediction](https://github.com/xsun28/CpGMethylation/tree/master/code/prediction) directory. In the code below, it is assumed that this conversion is completed and `all_wgbs_sites_winid.csv` was generated, which contains the genomic location in both hg38 and hg19 and window ID for all WGBS sites. 
 
 **1) Preparation for prediction beyond 450K array-based sites**
+
 There are approximately 26 million CpG sites in human genome. To reduce the workload, we select CpG sites within 100kb up-/down-stream to all TSS sites in the whole genome, reducig the number of CpG sites to approximately 8 million. Then we assign all features to these CpG sites. 
 
 The [WGBS_all_sites_feature_preprocess.py](https://github.com/xsun28/CpGMethylation/blob/master/code/features_preprocess/WGBS_all_sites_feature_preprocess.py) script available in  the [features_proprocess](https://github.com/xsun28/CpGMethylation/tree/master/code/features_preprocess) directory probacesses the CpG sites in the whole human genome in batches of 2 million sites. 
