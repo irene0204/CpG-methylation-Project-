@@ -27,10 +27,11 @@ There are approximately 26 million CpG sites in human genome. To reduce the work
 The [WGBS_all_sites_feature_preprocess.py](https://github.com/xsun28/CpGMethylation/blob/master/code/features_preprocess/WGBS_all_sites_feature_preprocess.py) script available in  the [features_proprocess](https://github.com/xsun28/CpGMethylation/tree/master/code/features_preprocess) directory probacesses the CpG sites in the whole human genome in batches of 2 million sites. 
 
 This step generates 8(?) HDF5 files corresponding 8 batches of CpG sites and their feature values:
-1. all_features_0_2000000
+`1. all_features_0_2000000
 2.
 3.
-....
+....`
+
 
 
 
