@@ -19,7 +19,7 @@ The following input files are needed:
 
 ## Running the pipeline 
 
-The genomic coordinates in this pipeline is in hg19. The original WGBS datasets are in hg38 and need to be converted to hg19. A CSV file containing all WGBS sites with their genomic location in hg19 can be generated using the [WGBS_allsites_preprocess.py](https://github.com/xsun28/CpGMethylation/blob/master/code/prediction/WGBS_allsites_preprocess.py)script 
+The genomic coordinates in this pipeline is in hg19. The original WGBS datasets are in hg38 and need to be converted to hg19. A CSV file containing all WGBS sites with their genomic location in hg19 can be generated using the `[WGBS_allsites_preprocess.py]`(https://github.com/xsun28/CpGMethylation/blob/master/code/prediction/WGBS_allsites_preprocess.py)script 
 
 ```python
 import pandas 
