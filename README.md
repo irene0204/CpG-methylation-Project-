@@ -21,7 +21,7 @@ The following input files are needed:
 
 ## Running the pipeline 
 
-Preliminary Step: 
+**Preliminary Step**: ++
 The genomic coordinates in this pipeline are 1-indexed/in hg19. The original WGBS datasets are 0-indexed/in hg38 and therefore need to be converted. This conversion can be completed by running the[WGBS_allsites_preprocess.py](https://github.com/xsun28/CpGMethylation/blob/master/code/prediction/WGBS_allsites_preprocess.py) script available in the [prediction](https://github.com/xsun28/CpGMethylation/tree/master/code/prediction) directory. The number of studied WGBS sites is reduced from `approximatly 28 million` to `approximatly 26 million` after this conversion due to using LiftOver (inconsistent chromosome, multiple conversion results, etc). 
 
 ``` 
