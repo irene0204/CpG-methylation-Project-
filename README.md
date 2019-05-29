@@ -63,6 +63,7 @@ all_features_0_2000000
 For furture model training purpose, we constructed a experimental set for each trait. In each set, we include positive sites (signficantly associated with AD) and negative sites (not significantly associated with AD). The inclusion criteria are as follows:
 
 a) Select positive sites whose p-values are below trait-specific threshold
+
 b) For each selected positive site, select 10 negative sites that:
 
 * have p-values greater than 0.4
