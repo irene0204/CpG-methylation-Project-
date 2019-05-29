@@ -7,9 +7,9 @@ This repository contains all components of the pipeline for predicting novel Alz
 
 ## Prerequites
 The following input files are needed:
-* CSV files with summary level data from the ROSMAP study. For each trait, the file includes CpG ID, F statistics and p-values (null hypothesis: AD samples have the same methylation leve as control samples) for `CpG sites whose methylation level was measured using Illumina 450K array (i.e. 450K sites)`.
+* CSV files with summary level data from the ROSMAP study. For each trait, the file includes CpG ID, F statistics and p-values (null hypothesis: AD samples have the same methylation leve as control samples) for *CpG sites whose methylation level was measured using Illumina 450K array (i.e. 450K sites)*.
 * a TXT file with the whole human genome spread across 200 base-pair intervals `wins.txt`
-* BED files with window IDs of `all CpG sites across the whole human genome (i.e. WGBS sites)` and values of the 1806 features used in our previously published work on DIVAN.  `1806.bed`
+* BED files with window IDs of *all CpG sites across the whole human genome (i.e. WGBS sites)* and values of the 1806 features used in our previously published work on DIVAN.  `1806.bed`
 * TSV.GZ files with genomic locations of WGBS sites and CADD scores `CADD.tsv.gz`
 * TSV.BGZ files with genomic locations of WGBS sites and DANN scores `DANN.tsv.bgz`
 * TAB.BGZ files with genomic locations of WGBS sites and EIGEN scores `EIGEN.tab.bgz`
@@ -60,7 +60,14 @@ all_features_0_2000000
 
 **3) Experimental set construction for each trait**
 
-For each trait, we pick out positive sites and negative sites from the ROSMAP CSV files to build a experimental set for future feature selection and model training processes. We set up p-value thresholds for positive site and negative sites so that for each trait, the experimental dataset contains appproximately 140 positives sites abd for each of them, we pick out 10 matching negative sites with the closest beta values. 
+For furture model training purpose, we constructed a experimental set for each trait. In each set, we include positive sites (signficantly associated with AD) and negative sites (not significantly associated with AD). The inclusion criteria are as follows:
+
+a) Select positive sites whose p-values are below trait-specific threshold
+b) For each selected positive site, select 10 negative sites that:
+
+* have p-values greater than 0.4
+* have the same methylation status (either hyper- and hypo) as the positive site
+* have the closest β-values as the positive site 
 
 The above process is achieved by running the [AD_sites_selection.py](https://github.com/xsun28/CpGMethylation/blob/master/code/sites_selection/AD_sites_selection.py) script available in the [site_selection](https://github.com/xsun28/CpGMethylation/tree/master/code/sites_selection) directory. 
 
