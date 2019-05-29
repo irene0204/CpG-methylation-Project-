@@ -1,5 +1,5 @@
 # CpG site methylation prediction project pipeline 
-This repository contains all components of the pipeline for predicting novel Alzheimer's Diseasr (AD)-associated CpG sites across the human genome, including training set construction, features collection/processing, features selection and ensemble learning, for each of the AD-associated trait of interest. 
+This repository contains all components of the pipeline for predicting novel Alzheimer's Diseasr (AD)-associated CpG sites across the human genome, including experimental set construction, features collection/processing, features selection and ensemble learning, for each of the AD-associated trait of interest. 
 
 ## Tools
 * Python 3.5
@@ -21,7 +21,7 @@ The following input files are needed:
 
 ## Running the pipeline 
 
-**Preliminary step: hg38 to hg19 conversion**
+**0) Preliminary step: hg38 to hg19 conversion**
 
 The genomic coordinates in this pipeline are 1-indexed/in hg19. The original WGBS datasets are 0-indexed/in hg38 and therefore need to be converted. This conversion can be completed by running the[WGBS_allsites_preprocess.py](https://github.com/xsun28/CpGMethylation/blob/master/code/prediction/WGBS_allsites_preprocess.py) script available in the [prediction](https://github.com/xsun28/CpGMethylation/tree/master/code/prediction) directory. The number of studied WGBS sites is reduced from `approximatly 28 million` to `approximatly 26 million` after this conversion due to using LiftOver (inconsistent chromosome, multiple conversion results, etc). 
 
@@ -50,7 +50,7 @@ WGBS_all_sites_feature_preprocess.py ${all_wgbs_sites_winid.csv} ${1806.bed} ${C
 
 This step generates HDF5 files for all batches of WGBS sites and their feature values:
 ``` 
-1. all_features_0_2000000
+all_features_0_2000000
 ....
 ```
 
@@ -58,7 +58,7 @@ This step generates HDF5 files for all batches of WGBS sites and their feature v
 
 
 
-**3) Experimental dataset construction for each trait**
+**3) Experimental set construction for each trait**
 
 For each trait, we pick out positive sites and negative sites from the ROSMAP CSV files to build a experimental set for future feature selection and model training processes. We set up p-value thresholds for positive site and negative sites so that for each trait, the experimental dataset contains appproximately 140 positives sites abd for each of them, we pick out 10 matching negative sites with the closest beta values. 
 
