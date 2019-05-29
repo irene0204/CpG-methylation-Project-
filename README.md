@@ -1,5 +1,5 @@
 # CpG site methylation prediction project pipeline 
-This repository contains all components of the CpG site methylation prediction pipeline, including constructing a experimental dataset for each trait with postive sites (AD associated) and negative sites (not AD assciated), processing features, selecting top 60 important features, model parameter tuning and selection and prediction of whole genome CpG sites. 
+This repository contains all components of the pipeline for predicting novel Alzheimer's Diseasr (AD)-associated CpG sites across the human genome, including training set construction, features collection/processing, features selection and ensemble learning, for each of the AD-associated trait of interest. 
 
 ## Tools
 * Python 3.5
@@ -7,19 +7,28 @@ This repository contains all components of the CpG site methylation prediction p
 
 ## Prerequites
 The following input files are needed:
-* CSV files with 450K sites CpG ID, F statistics and p-values for differential methylation between AD patients and normal subjects for each trait from the ROSMAP study
-* a TXT file with the whole genome spread across 200 base-pair intervals 
-* BED files with sites window ID and feature values for 1806 epigenomic features related to histone modification, TF binding, open chromatin and RNA Pol II/III binding
-* TSV.GZ files with site coordinates and CADD scores 
-* TSV.BGZ files with site coordinates and DANN scores 
-* TAB.BGZ files with sites coordinates and EIGEN scores
-* BED files with sites window ID and RNA-sequencing read counts data
-* BED files with sites window ID and ATAC-sequencing read counts data
-* BED files with site coordinates and WGBS read counts from various tissue/cell types 
+* CSV files with summary level data from the ROSMAP study. For each trait, the file includes CpG ID, F statistics and p-values (null hypothesis: AD samples have the same methylation leve as control samples) for CpG sites whose methylation level was measured using Illumina 450K array.
+* a TXT file with the whole human genome spread across 200 base-pair intervals 
+* BED files with window IDs of all CpG sites and values of the 1806 features used in our previously published work on DIVAN. 
+* TSV.GZ files with genomic locations of all CpG sites and CADD scores 
+* TSV.BGZ files with genomic locations of all CpG sites and DANN scores 
+* TAB.BGZ files with genomic locations of all CpG sites and EIGEN scores
+* BED files with window IDs of all CpG sites and RNA-sequencing read counts data
+* BED files with window IDs of all CpG sites and ATAC-sequencing read counts data
+* BED files with genomic locations of all CpG sites and WGBS read counts data `${wgbs_readcounts.bed}`
 
 ## Running the pipeline 
 
-The genomic coordinates in this pipeline are in hg19. The original WGBS datasets are in hg38 and need to be converted to hg19. A CSV file containing all WGBS sites with their genomic location in hg19 can be generated using the [WGBS_allsites_preprocess.py](https://github.com/xsun28/CpGMethylation/blob/master/code/prediction/WGBS_allsites_preprocess.py) script available in the [prediction](https://github.com/xsun28/CpGMethylation/tree/master/code/prediction) directory. In the code below, it is assumed that this conversion is completed and `all_wgbs_sites_winid.csv` was generated, which contains the genomic location in both hg38 and hg19 and window ID for all WGBS sites. 
+The genomic coordinates in this pipeline are 1-indexed/in hg19. The original WGBS datasets are 0-indexed/in hg38 and therefore need to be converted. This conversion can be completed by running the[WGBS_allsites_preprocess.py](https://github.com/xsun28/CpGMethylation/blob/master/code/prediction/WGBS_allsites_preprocess.py) script available in the [prediction](https://github.com/xsun28/CpGMethylation/tree/master/code/prediction) directory. 
+
+``` 
+WGBS_allsites_preprocess.py ${wgbs_readcounts.bed}
+```
+The file `${wgbs_readcounts.bed}`contains the 0-indexed/hg38 genomic locations of all CpG sites across the entire human genome.
+
+This step generates `all_wgbs_sites_winid.csv`,which contains the genomic locations in both hg38 and hg19 and window IDs for all CpG sites across the entire human genome. 
+
+In the code below, it is assumed that this conversion is completed and `all_wgbs_sites_winid.csv` was generated. 
 
 **1) Preparation for prediction beyond 450K array-based sites-asssign feaatures to WGBS sites**
 
