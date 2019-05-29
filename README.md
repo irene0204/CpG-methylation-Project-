@@ -7,7 +7,7 @@ This repository contains all components of the pipeline for predicting novel Alz
 
 ## Prerequites
 The following input files are needed:
-* CSV files with summary level data from the ROSMAP study. For each trait, the file includes CpG ID, F statistics and p-values (null hypothesis: AD samples have the same methylation leve as control samples) for *CpG sites whose methylation level was measured using Illumina 450K array (i.e. 450K sites)*. `ROSMAP.csv`
+* CSV files with summary level data from the ROSMAP study. For each trait, the file includes CpG ID, F statistics and p-values (null hypothesis: AD samples have the same methylation level as control samples) for *CpG sites whose methylation level was measured using Illumina 450K array (i.e. 450K sites)*. `ROSMAP.csv`
 * a TXT file with the whole human genome spread across 200 base-pair intervals `wins.txt`
 * BED files with window IDs of *all CpG sites across the whole human genome (i.e. WGBS sites)* and values of the 1806 features used in our previously published work on DIVAN.  `1806.bed`
 * TSV.GZ files with genomic locations of WGBS sites and CADD scores `CADD.tsv.gz`
@@ -17,6 +17,8 @@ The following input files are needed:
 * BED files with window IDs of WGBS sites and RNA-sequencing read counts data `RNASEQ.bed`
 * BED files with window IDs of WGBS sites and ATAC-sequencing read counts data `ATACSEQ.bed`
 * BED files with genomic locations of WGBS sites and WGBS read counts data `wgbs_readcounts.bed`
+* TXT files with genomic locations of transcription start sites (tss) `tss.txt`
+
 
 
 ## Running the pipeline 
@@ -43,9 +45,16 @@ By running the [WGBS_all_sites_feature_preprocess.py](https://github.com/xsun28/
 
 ``` 
 WGBS_all_sites_feature_preprocess.py ${all_wgbs_sites_winid.csv} ${1806.bed} ${CADD.tsv.gz} \
-    ${DANN.tsv.bgz} ${EIGEN.tab.bgz} ${GWAVA.bed.gz} ${RNASEQ.bed} ${ATACSEQ.bed} ${wgbs_readcounts.bed}
-
+    ${DANN.tsv.bgz} ${EIGEN.tab.bgz} ${GWAVA.bed.gz} ${RNASEQ.bed} ${ATACSEQ.bed} ${wgbs_readcounts.bed} ${tss.txt}
 ```
+
+The features are processed as follows:
+
+* 1806 features in the DIVAN study are constructed to cover the entire human genome in 200 base-pair resolution and assigned to each site by matching the window ID
+* CADD, DANN, EIGEN, GenoCanyon and GWAVA scores are assigned to each site by matching genomic location
+* RNA-sequencing amd ATAC-sequencing readcounts data are assigned to each site by matching window ID
+* Nearest tss are found for each site
+
 
 
 This step generates HDF5 files for all batches of WGBS sites and their feature values:
@@ -80,8 +89,7 @@ AD_sites_selection.py ${ROSMAP.csv} ${wins.txt} \
     --tangles_positive_threshold 0.0000005 \
     --cogdec_positive_threshold 0.00003 \
     --gpath_positive_threshold 0.00001 \
-    --braak_positive_threshold 0.00005 
-       
+    --braak_positive_threshold 0.00005       
 ```
 
 This step outputs 7 CSV files for 7 traits: 
@@ -93,7 +101,6 @@ which contains the selected experimental set with columns: CpG ID, chromosome, c
 and 1 CSV file for all 450K sites:
 ``` 
 all_450k_sites_winid.csv
-
 ```
 which contains all 450k sites with with columns: CpG ID, chromosome, coordinate, p-value, β-value and window ID. 
 
@@ -104,45 +111,46 @@ By running the [all_features_preprocess.py](https://github.com/xsun28/CpGMethyla
 
 ``` 
 all_features_preprocess.py ${all_sites_winid.csv} ${1806.bed} ${CADD.tsv.gz} \
-    ${DANN.tsv.bgz} ${EIGEN.tab.bgz} ${GWAVA.bed.gz} ${RNASEQ.bed} ${ATACSEQ.bed} ${wgbs_readcounts.bed}
-     
+    ${DANN.tsv.bgz} ${EIGEN.tab.bgz} ${GWAVA.bed.gz} ${RNASEQ.bed} ${ATACSEQ.bed} ${wgbs_readcounts.bed} ${tss.txt}
 ```
 
 
-This step generates 7 HDF5 files under 7 trait folders:
+This step generates 7 HDF5 files for 7 traits:
 ``` 
 all_features
 ```
-which contains all feature values for the complete dataset of each trait.
+which contains all feature values of the experimental set for each trait.
 
 
 **5) Feature selection for each trait**
 
-Considering we have 2069 features in total and experimental dataset of limited size, we want to reduce the number of features to avoid the "small N large P" problem. 
+Considering the number of features is greater than the number of CpG sites in the experimental set, we need to perform features selection to avoid overfitting. 
 
-The feature selection process is achived by running the 
+The feature selection process is achived by running the [feature_selection.py](https://github.com/xsun28/CpGMethylation/blob/master/code/features_selection/feature_selection.py) script available in the [features_selection](https://github.com/xsun28/CpGMethylation/tree/master/code/features_selection) directory.
 
-[feature_selection.py](https://github.com/xsun28/CpGMethylation/blob/master/code/features_selection/feature_selection.py) script available in the [features_selection](https://github.com/xsun28/CpGMethylation/tree/master/code/features_selection) directory, in which we:
+``` 
+feature_selection.py ${all_features.h5}
+```
+The features are selected as follows for each trait: 
 
-* split train/test data on 9:1 ratio and scaled the train data (?????) 
-* used random forest, xgboost, logistic regression and linear_SVC to fit the train data and pick out top 100 significant features 
-* rank selected features by the number of classifiers that select it (n)
-* calculate the p-values which indicates the differences of the selected features between positive sites and negative sites 
-* rank selected features first by desceding n and then by ascending p-value 
-* select top 60 ranked features for each trait 
+* Split training/testing data on 9:1 ratio 
+* Select top 100 significant features by fitting the training data using random forest, xgboost, logistic regression and SVC with linear kernel, respectively. 
+* For each selected feature, summarize the number of classifiers that select it, n (0<n≤4) 
+* For each selected feature, calculate the p-values under the null hypothesis: AD samples have the feature values as control samples)
+* From top to bottom, sort selected features first by desceding n and then by ascending p-value 
+* Select top ranked features for each trait 
 
 This step outputs a CSV file:
 ``` 
 feature_stats.csv 
 ```
-which contains information of the selected feaures, including feature name, p-value, and n
+which contains information of the top ranked feaures, including feature name, p-value, and n
 
 and a HDF5 file:
 ``` 
 selected_features 
 ```
-which contains the train and test dataframe with only the selected features, and the sample weights for train and test data. 
-
+which contains the train and test dataframe with the values of top ranked features assigned
 
 **6) Model parameter tuning and model selection for each trait**
 
