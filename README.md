@@ -7,40 +7,45 @@ This repository contains all components of the pipeline for predicting novel Alz
 
 ## Prerequites
 The following input files are needed:
-* CSV files with summary level data from the ROSMAP study. For each trait, the file includes CpG ID, F statistics and p-values (null hypothesis: AD samples have the same methylation leve as control samples) for CpG sites whose methylation level was measured using Illumina 450K array.
-* a TXT file with the whole human genome spread across 200 base-pair intervals 
-* BED files with window IDs of all CpG sites and values of the 1806 features used in our previously published work on DIVAN. 
-* TSV.GZ files with genomic locations of all CpG sites and CADD scores 
-* TSV.BGZ files with genomic locations of all CpG sites and DANN scores 
-* TAB.BGZ files with genomic locations of all CpG sites and EIGEN scores
-* BED files with window IDs of all CpG sites and RNA-sequencing read counts data
-* BED files with window IDs of all CpG sites and ATAC-sequencing read counts data
-* BED files with genomic locations of all CpG sites and WGBS read counts data `${wgbs_readcounts.bed}`
+* CSV files with summary level data from the ROSMAP study. For each trait, the file includes CpG ID, F statistics and p-values (null hypothesis: AD samples have the same methylation leve as control samples) for `CpG sites whose methylation level was measured using Illumina 450K array (i.e. 450K sites)`.
+* a TXT file with the whole human genome spread across 200 base-pair intervals `wins.txt`
+* BED files with window IDs of `all CpG sites across the whole human genome (i.e. WGBS sites)` and values of the 1806 features used in our previously published work on DIVAN.  `1806.bed`
+* TSV.GZ files with genomic locations of WGBS sites and CADD scores `CADD.tsv.gz`
+* TSV.BGZ files with genomic locations of WGBS sites and DANN scores `DANN.tsv.bgz`
+* TAB.BGZ files with genomic locations of WGBS sites and EIGEN scores `EIGEN.tab.bgz`
+* BED.GZ files with genomic locations of WGBS sites and GWAVA scores `GWAVA.bed.gz`
+* BED files with window IDs of WGBS sites and RNA-sequencing read counts data `RNASEQ.bed`
+* BED files with window IDs of WGBS sites and ATAC-sequencing read counts data `ATACSEQ.bed`
+* BED files with genomic locations of WGBS sites and WGBS read counts data `wgbs_readcounts.bed`
 
 ## Running the pipeline 
 
-The genomic coordinates in this pipeline are 1-indexed/in hg19. The original WGBS datasets are 0-indexed/in hg38 and therefore need to be converted. This conversion can be completed by running the[WGBS_allsites_preprocess.py](https://github.com/xsun28/CpGMethylation/blob/master/code/prediction/WGBS_allsites_preprocess.py) script available in the [prediction](https://github.com/xsun28/CpGMethylation/tree/master/code/prediction) directory. 
+The genomic coordinates in this pipeline are 1-indexed/in hg19. The original WGBS datasets are 0-indexed/in hg38 and therefore need to be converted. This conversion can be completed by running the[WGBS_allsites_preprocess.py](https://github.com/xsun28/CpGMethylation/blob/master/code/prediction/WGBS_allsites_preprocess.py) script available in the [prediction](https://github.com/xsun28/CpGMethylation/tree/master/code/prediction) directory. The number of studied WGBS sites is reduced from `approximatly 28 million` to `approximatly 26 million` after this conversion due to using LiftOver (inconsistent chromosome, multiple conversion results, etc). 
 
 ``` 
-WGBS_allsites_preprocess.py ${wgbs_readcounts.bed}
+WGBS_allsites_preprocess.py ${wgbs_readcounts.bed} ${wins.txt}
 ```
-The file `${wgbs_readcounts.bed}`contains the 0-indexed/hg38 genomic locations of all CpG sites across the entire human genome.
+The file `${wgbs_readcounts.bed}`contains the 0-indexed/hg38 genomic locations of WGBS sites.
 
-This step generates `all_wgbs_sites_winid.csv`,which contains the genomic locations in both hg38 and hg19 and window IDs for all CpG sites across the entire human genome. 
+This step generates `all_wgbs_sites_winid.csv`,which contains the genomic locations in both hg38 and hg19 and window IDs for WGBS sites. 
 
-In the code below, it is assumed that this conversion is completed and `all_wgbs_sites_winid.csv` was generated. 
 
-**1) Preparation for prediction beyond 450K array-based sites-asssign feaatures to WGBS sites**
+**1) Asssigning feature values to WGBS sites**
 
-There are approximately 26 million CpG sites in human genome. To reduce the workload, we select CpG sites within 100kb up-/down-stream to all TSS sites in the whole genome, reducig the number of CpG sites to approximately 8 million. Then we assign all features to these CpG sites. 
+To prepare for future prediction of AD-associated WGBS sites, we first assign all (2256) feature values to WGBS sites. 
 
-The [WGBS_all_sites_feature_preprocess.py](https://github.com/xsun28/CpGMethylation/blob/master/code/features_preprocess/WGBS_all_sites_feature_preprocess.py) script available in  the [features_proprocess](https://github.com/xsun28/CpGMethylation/tree/master/code/features_preprocess) directory, which processes the CpG sites in the whole human genome in batches of 2 million sites. 
+By running the [WGBS_all_sites_feature_preprocess.py](https://github.com/xsun28/CpGMethylation/blob/master/code/features_preprocess/WGBS_all_sites_feature_preprocess.py) script in the [features_proprocess](https://github.com/xsun28/CpGMethylation/tree/master/code/features_preprocess) directory, we can processes features of WGBS sites in batches of 2 million for the consideration of memory limit. 
 
-This step generates 8(?) HDF5 files corresponding 8 batches of CpG sites and their feature values:
+``` 
+WGBS_all_sites_feature_preprocess.py ${all_wgbs_sites_winid.csv} ${1806.bed} ${CADD.tsv.gz} \
+    ${DANN.tsv.bgz} ${EIGEN.tab.bgz} ${GWAVA.bed.gz} ${RNASEQ.bed} ${ATACSEQ.bed} ${wgbs_readcounts.bed}
+
+```
+
+
+This step generates HDF5 files for all batches of WGBS sites and their feature values:
 ``` 
 1. all_features_0_2000000
-2.
-3.
 ....
 ```
 
