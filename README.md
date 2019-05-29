@@ -18,8 +18,10 @@ The following input files are needed:
 * BED files with window IDs of WGBS sites and ATAC-sequencing read counts data `ATACSEQ.bed`
 * BED files with genomic locations of WGBS sites and WGBS read counts data `wgbs_readcounts.bed`
 
+
 ## Running the pipeline 
 
+Preliminary Step: 
 The genomic coordinates in this pipeline are 1-indexed/in hg19. The original WGBS datasets are 0-indexed/in hg38 and therefore need to be converted. This conversion can be completed by running the[WGBS_allsites_preprocess.py](https://github.com/xsun28/CpGMethylation/blob/master/code/prediction/WGBS_allsites_preprocess.py) script available in the [prediction](https://github.com/xsun28/CpGMethylation/tree/master/code/prediction) directory. The number of studied WGBS sites is reduced from `approximatly 28 million` to `approximatly 26 million` after this conversion due to using LiftOver (inconsistent chromosome, multiple conversion results, etc). 
 
 ``` 
@@ -28,6 +30,8 @@ WGBS_allsites_preprocess.py ${wgbs_readcounts.bed} ${wins.txt}
 The file `${wgbs_readcounts.bed}`contains the 0-indexed/hg38 genomic locations of WGBS sites.
 
 This step generates `all_wgbs_sites_winid.csv`,which contains the genomic locations in both hg38 and hg19 and window IDs for WGBS sites. 
+
+
 
 
 **1) Asssigning feature values to WGBS sites**
