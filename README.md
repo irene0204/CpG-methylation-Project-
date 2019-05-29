@@ -7,7 +7,7 @@ This repository contains all components of the pipeline for predicting novel Alz
 
 ## Prerequites
 The following input files are needed:
-* CSV files with summary level data from the ROSMAP study. For each trait, the file includes CpG ID, F statistics and p-values (null hypothesis: AD samples have the same methylation leve as control samples) for *CpG sites whose methylation level was measured using Illumina 450K array (i.e. 450K sites)*.
+* CSV files with summary level data from the ROSMAP study. For each trait, the file includes CpG ID, F statistics and p-values (null hypothesis: AD samples have the same methylation leve as control samples) for *CpG sites whose methylation level was measured using Illumina 450K array (i.e. 450K sites)*. `ROSMAP.csv`
 * a TXT file with the whole human genome spread across 200 base-pair intervals `wins.txt`
 * BED files with window IDs of *all CpG sites across the whole human genome (i.e. WGBS sites)* and values of the 1806 features used in our previously published work on DIVAN.  `1806.bed`
 * TSV.GZ files with genomic locations of WGBS sites and CADD scores `CADD.tsv.gz`
@@ -35,7 +35,7 @@ This step generates `all_wgbs_sites_winid.csv`,which contains the genomic locati
 
 
 
-**1) Asssigning feature values to WGBS sites**
+**1) Asssign feature values to WGBS sites**
 
 To prepare for future prediction of AD-associated WGBS sites, we first assign all (2256) feature values to WGBS sites. 
 
@@ -67,27 +67,47 @@ a) Select positive sites whose p-values are below trait-specific threshold
 b) For each selected positive site, select 10 negative sites that:
 
 * have p-values greater than 0.4
-* have the same methylation status (either hyper- and hypo) as the positive site
+* have the same methylation status (either hyper- and hypo-) as the positive site
 * have the closest β-values as the positive site 
 
 The above process is achieved by running the [AD_sites_selection.py](https://github.com/xsun28/CpGMethylation/blob/master/code/sites_selection/AD_sites_selection.py) script available in the [site_selection](https://github.com/xsun28/CpGMethylation/tree/master/code/sites_selection) directory. 
 
-This step outputs 7 CSV files under 7 trait folders and 1 CSV file for all 450K sites: 
+``` 
+AD_sites_selection.py ${ROSMAP.csv} ${wins.txt} \
+    --amyloid_positive_threshold 0.00005 \
+    --cerad_positive_threshold 0.00001 \
+    --ceradaf_positive_threshold 0.00005 \
+    --tangles_positive_threshold 0.0000005 \
+    --cogdec_positive_threshold 0.00003 \
+    --gpath_positive_threshold 0.00001 \
+    --braak_positive_threshold 0.00005 
+       
+```
+
+This step outputs 7 CSV files for 7 traits: 
 ``` 
 all_sites_winid.csv
 ```
-which contains the selected postive and negative sites with their CpG ID, chromosome, coordinate, p-value, beta value and label, negative sites are labeled as 0 and positive sites are labeled as 1. 
+which contains the selected experimental set with columns: CpG ID, chromosome, coordinate, p-value, β-value, label (0 for negative sites/1 for positive sites) and window ID. 
 
 and 1 CSV file for all 450K sites:
 ``` 
 all_450k_sites_winid.csv
+
 ```
-which contains all 450k sites with their CpG ID, chromosome, coordinate, p-value, beta value 
+which contains all 450k sites with with columns: CpG ID, chromosome, coordinate, p-value, β-value and window ID. 
 
 
-**4) Assign feature values to the experimental dataset for each trait**
+**4) Assign feature values to the experimental set for each trait**
 
-Using the [all_features_preprocess.py](https://github.com/xsun28/CpGMethylation/blob/master/code/features_preprocess/all_features_preprocess.py) script available in the [features_proprocess](https://github.com/xsun28/CpGMethylation/tree/master/code/features_preprocess) directory, we obtain feature values for the selected experimental dataset for each trait.
+By running the [all_features_preprocess.py](https://github.com/xsun28/CpGMethylation/blob/master/code/features_preprocess/all_features_preprocess.py) script available in the [features_proprocess](https://github.com/xsun28/CpGMethylation/tree/master/code/features_preprocess) directory, we assign feature values to the constructed experimental dataset for each trait.
+
+``` 
+all_features_preprocess.py ${all_sites_winid.csv} ${1806.bed} ${CADD.tsv.gz} \
+    ${DANN.tsv.bgz} ${EIGEN.tab.bgz} ${GWAVA.bed.gz} ${RNASEQ.bed} ${ATACSEQ.bed} ${wgbs_readcounts.bed}
+     
+```
+
 
 This step generates 7 HDF5 files under 7 trait folders:
 ``` 
