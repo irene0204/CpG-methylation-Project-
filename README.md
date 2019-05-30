@@ -4,7 +4,7 @@ This repository contains all components of the pipeline for predicting novel Alz
 ## Tools
 * Python 3.6
 * R 3.4
-* Amazon Elastic Compute Cloud (AWC EC2)
+* Amazon Elastic Compute Cloud (AWS EC2)
 
 ## Prerequites
 The following input files are needed:
