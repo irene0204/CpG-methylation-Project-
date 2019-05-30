@@ -210,6 +210,7 @@ WGBS_alltraits_prediction_AD.py ?????
 This step generates 2 csv files for WGBS sites:
 
 1)`common_top500_mean_nearest_450k.csv`, which contains the top 500 sites with highest unweighted average of 7 probabilities; 
+
 2)`common_top500_weighted_nearest_450k.csv`,  which contains the top 500 sites with highest weighted average of 7 probabilities
 
 and a csv file for 450K sites:
