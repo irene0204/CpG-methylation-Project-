@@ -177,6 +177,7 @@ The optimal parameters for each base classifier and and the best combination of 
 * Calculates average AUC, F1-score, etc across all 10 folds 
 * Select the best combination of base classifiers 
 
+output?????
 
 **7) Predict 450K sites and WGBS sites for each trait**
 
@@ -184,7 +185,7 @@ We use the selected ensemble model from step 6 to make predictions on CpG sites 
 
 
 ``` 
-WGBS_prediction.py ${selected_features.h5} ${all_features_0_2000000.h5} ${all_450k_features.h5}
+WGBS_prediction.py ${selected_features.h5} ${all_features_0_2000000.h5} ${all_450k_features.h5}???
 ```
 
 In this step, we first retrain the base classifiers in the ensemble model using the entire experimental set to obtain the optimal parameters, then we predict the probabilities of 450K sites/WGBS sites being positive. CpG sites are ranked in descendig orders of these probabilities and top 500 sites are selected as candidates for experimental validation. 
