@@ -93,7 +93,8 @@ By running the [all450k_feature_preprocess.py](https://github.com/xsun28/CpGMeth
 
 ``` 
 all450k_feature_preprocess.py ${all_450k_sites_winid.csv} ${DIVAN_features.bed} ${CADD.tsv.gz} \
-    ${DANN.tsv.bgz} ${EIGEN.tab.bgz} ${GWAVA.bed.gz} ${RNASEQ.bed} ${ATACSEQ.bed} ${wgbs_readcounts.bed} ${tss.txt}
+    ${DANN.tsv.bgz} ${EIGEN.tab.bgz} ${GWAVA.bed.gz} ${RNASEQ.bed} ${ATACSEQ.bed} \
+    ${wgbs_readcounts.bed} ${tss.txt}
 ```
 This step generates a HDF5 file for 450K sites and their feature values:
 ``` 
@@ -144,7 +145,8 @@ By running the [all_features_preprocess.py](https://github.com/xsun28/CpGMethyla
 
 ``` 
 all_features_preprocess.py ${all_sites_winid.csv} ${DIVAN_features.bed} ${CADD.tsv.gz} \
-    ${DANN.tsv.bgz} ${EIGEN.tab.bgz} ${GWAVA.bed.gz} ${RNASEQ.bed} ${ATACSEQ.bed} ${wgbs_readcounts.bed} ${tss.txt}
+    ${DANN.tsv.bgz} ${EIGEN.tab.bgz} ${GWAVA.bed.gz} ${RNASEQ.bed} ${ATACSEQ.bed} \
+    ${wgbs_readcounts.bed} ${tss.txt}
 ```
 
 
@@ -232,7 +234,8 @@ Since we have 7 models trained from datasets of 7 traits, we take both the avera
 The above process can be achieved by running [WGBS_alltraits_prediction_AD.py](https://github.com/xsun28/CpGMethylation/blob/master/code/prediction/WGBS_alltraits_prediction_AD.py) script available in the [prediction](https://github.com/xsun28/CpGMethylation/tree/master/code/prediction) directory.
 
 ``` 
-WGBS_alltraits_prediction_AD.py ${10fold_test_results.pkl} ${pred_probs.h5} ${pred_probs_450k} ${tss.txt}
+WGBS_alltraits_prediction_AD.py ${10fold_test_results.pkl} ${pred_probs.h5} \
+        ${pred_probs_450k.h5} ${tss.txt}
 ```
 The file `${10fold_test_results.pkl}` is an intermediate output from step 6), which contains F1 score of the ensemble model for each trait. 
 
