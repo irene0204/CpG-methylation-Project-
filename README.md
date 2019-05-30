@@ -9,7 +9,7 @@ This repository contains all components of the pipeline for predicting novel Alz
 The following input files are needed:
 * CSV files with summary level data from the ROSMAP study. For each trait, the file includes CpG ID, F statistics and p-values (null hypothesis: AD samples have the same methylation level as control samples) for *CpG sites whose methylation level was measured using Illumina 450K array (i.e. 450K sites)*. `ROSMAP.csv`
 * a TXT file with the whole human genome spread across 200 base-pair intervals `wins.txt`
-* BED files with window IDs of *all CpG sites across the whole human genome (i.e. WGBS sites)* and values of the 1806 features used in our previously published work on DIVAN.  `1806.bed`
+* BED files with window IDs of *all CpG sites across the whole human genome (i.e. WGBS sites)* and values of the 1806 features used in our previously published work on DIVAN.  `DIVAN_features.bed`
 * TSV.GZ files with genomic locations of WGBS sites and CADD scores `CADD.tsv.gz`
 * TSV.BGZ files with genomic locations of WGBS sites and DANN scores `DANN.tsv.bgz`
 * TAB.BGZ files with genomic locations of WGBS sites and EIGEN scores `EIGEN.tab.bgz`
@@ -41,10 +41,10 @@ This step generates `all_wgbs_sites_winid.csv`,which contains the genomic locati
 
 To prepare for future prediction of AD-associated WGBS sites, we first assign all (2256) feature values to WGBS sites. 
 
-By running the [WGBS_all_sites_feature_preprocess.py](https://github.com/xsun28/CpGMethylation/blob/master/code/features_preprocess/WGBS_all_sites_feature_preprocess.py) script in the [features_proprocess](https://github.com/xsun28/CpGMethylation/tree/master/code/features_preprocess) directory, we can processes features of WGBS sites in batches of 2 million for the consideration of memory limit. 
+By running the [WGBS_all_sites_feature_preprocess.py](https://github.com/xsun28/CpGMethylation/blob/master/code/features_preprocess/WGBS_all_sites_feature_preprocess.py) script in the [features_proprocess](https://github.com/xsun28/CpGMethylation/tree/master/code/features_preprocess) directory, we can processes features of WGBS sites in 14 batches of 2 million for the consideration of memory limit. 
 
 ``` 
-WGBS_all_sites_feature_preprocess.py ${all_wgbs_sites_winid.csv} ${1806.bed} ${CADD.tsv.gz} \
+WGBS_all_sites_feature_preprocess.py ${all_wgbs_sites_winid.csv} ${DIVAN_features.bed} ${CADD.tsv.gz} \
     ${DANN.tsv.bgz} ${EIGEN.tab.bgz} ${GWAVA.bed.gz} ${RNASEQ.bed} ${ATACSEQ.bed} ${wgbs_readcounts.bed} ${tss.txt}
 ```
 
@@ -53,8 +53,30 @@ The features are processed as follows:
 * 1806 features in the DIVAN study are constructed to cover the entire human genome in 200 base-pair resolution and assigned to each site by matching the window ID
 * CADD, DANN, EIGEN, GenoCanyon and GWAVA scores are assigned to each site by matching genomic location
 * RNA-sequencing amd ATAC-sequencing readcounts data are assigned to each site by matching window ID
-* Nearest tss are found for each site
-
+* Distance to the nearest tss are found for each site
+* Summary of all features 
+  | Feature source         | Number   | 
+  | -------------          |:--------:| 
+  | REMC DNase             | 73       |
+  | REMC Histone           | 735      | 
+  | ENCODE DNase           | 80       |   
+  | ENCODE FAIRE           | 31       |   
+  | ENCODE TF(HAIB)        | 292      |   
+  | ENCODE TF(SYDH)        | 279      |   
+  | ENCODE Histone         | 267      |   
+  | ENCODE RNA Polymerase  | 49       |   
+  | ENCODE RNA-seq         | 243      |   
+  | ENCODE ATAC-seq        | 66       |   
+  | GenoCaynon             | 1        |   
+  | Eigen                  | 4        |   
+  | DANN                   | 2        |   
+  | CADD                   | 2        |   
+  | GWAVA                  | 4        | 
+  | Distance to nearest TSS| 1        | 
+  | WGBS                   | 127      | 
+  | Total                  | 2256     | 
+  
+  
 
 
 This step generates HDF5 files for all batches of WGBS sites and their feature values:
@@ -68,7 +90,7 @@ all_features_0_2000000
 By running the [all450k_feature_preprocess.py](https://github.com/xsun28/CpGMethylation/blob/master/code/features_preprocess/all450k_feature_preprocess.py) script in the [features_proprocess](https://github.com/xsun28/CpGMethylation/tree/master/code/features_preprocess) directory, we assign all (2256) feature values to 450K sites.
 
 ``` 
-all450k_feature_preprocess.py ${all_450k_sites_winid.csv} ${1806.bed} ${CADD.tsv.gz} \
+all450k_feature_preprocess.py ${all_450k_sites_winid.csv} ${DIVAN_features.bed} ${CADD.tsv.gz} \
     ${DANN.tsv.bgz} ${EIGEN.tab.bgz} ${GWAVA.bed.gz} ${RNASEQ.bed} ${ATACSEQ.bed} ${wgbs_readcounts.bed} ${tss.txt}
 ```
 This step generates a HDF5 file for 450K sites and their feature values:
@@ -119,7 +141,7 @@ which contains all 450k sites with with columns: CpG ID, chromosome, coordinate,
 By running the [all_features_preprocess.py](https://github.com/xsun28/CpGMethylation/blob/master/code/features_preprocess/all_features_preprocess.py) script available in the [features_proprocess](https://github.com/xsun28/CpGMethylation/tree/master/code/features_preprocess) directory, we assign feature values to the constructed experimental dataset for each trait.
 
 ``` 
-all_features_preprocess.py ${all_sites_winid.csv} ${1806.bed} ${CADD.tsv.gz} \
+all_features_preprocess.py ${all_sites_winid.csv} ${DIVAN_features.bed} ${CADD.tsv.gz} \
     ${DANN.tsv.bgz} ${EIGEN.tab.bgz} ${GWAVA.bed.gz} ${RNASEQ.bed} ${ATACSEQ.bed} ${wgbs_readcounts.bed} ${tss.txt}
 ```
 
@@ -196,7 +218,7 @@ This step generates 2 CSV files for each trait:
 
 2)`top500_nearest_450k.csv`, which contains the 450K sites within 5k up/downstream of top 500 predicted sites with their CpG ID and genomic location.
 
-and a HDF5 file `pred_probs_450k`, which contains the all 450K sites and their probabilities of being positive. 
+and a HDF5 file `pred_probs_450k`, which contains all 450K sites and their probabilities of being positive. 
 
 **8) Combine results for all AD traits**
 
