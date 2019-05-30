@@ -45,7 +45,8 @@ By running the [WGBS_all_sites_feature_preprocess.py](https://github.com/xsun28/
 
 ``` 
 WGBS_all_sites_feature_preprocess.py ${all_wgbs_sites_winid.csv} ${DIVAN_features.bed} ${CADD.tsv.gz} \
-    ${DANN.tsv.bgz} ${EIGEN.tab.bgz} ${GWAVA.bed.gz} ${RNASEQ.bed} ${ATACSEQ.bed} ${wgbs_readcounts.bed} ${tss.txt}
+    ${DANN.tsv.bgz} ${EIGEN.tab.bgz} ${GWAVA.bed.gz} ${RNASEQ.bed} ${ATACSEQ.bed} \
+    ${wgbs_readcounts.bed} ${tss.txt}
 ```
 
 The features are processed as follows:
@@ -169,7 +170,7 @@ The features are selected as follows for each trait:
 * Select top 100 significant features by fitting the training data using random forest, xgboost, logistic regression and support vector classifier (SVC) with linear kernel, respectively. 
 * For each selected feature, summarize the number of classifiers that select it, n (0<n≤4) 
 * Keep features with n≥2
-* For each of the kept feature, perform Wilcoxon rank-sum test and calculate the p-values under the null hypothesis: AD samples have the feature values as control samples
+* For each of the kept feature, perform Wilcoxon rank-sum test and calculate the p-values under the null hypothesis: AD samples have the same feature values as control samples
 * From top to bottom, sort selected features first by desceding n and then by ascending p-value 
 * Select top ranked features for each trait 
 
@@ -187,20 +188,19 @@ which contains the training and testing set with the values of top ranked featur
 
 **6) Model parameter tuning and model selection for each trait**
 
-We use 4 base classifiers, random forest, xgboost, logistic regression with L2-regularization and SVC with linear kernel.The optimal  paramters for each classifier and best combination of base classifiers are selected by running the [ModelSelectionTuning.py](https://github.com/xsun28/CpGMethylation/blob/master/code/models/ModelSelectionTuning.py) script available in the [models](https://github.com/xsun28/CpGMethylation/tree/master/code/models) directory.
+We use 4 base classifiers, random forest, xgboost, logistic regression with L2-regularization and SVC with linear kernel.The optimal  hyper-paramters for each classifier and best combination of base classifiers are selected by running the [ModelSelectionTuning.py](https://github.com/xsun28/CpGMethylation/blob/master/code/models/ModelSelectionTuning.py) script available in the [models](https://github.com/xsun28/CpGMethylation/tree/master/code/models) directory.
 
 ``` 
 ModelSelectionTuning.py ${selected_features.h5}
 ```
 
-The optimal parameters for each base classifier and and the best combination of base classifiers are selected as follows:
+The optimal hyper-parameters for each base classifier and and the best combination of base classifiers are selected as follows:
 
 * Use the training set (generated from step 5) with 3-fold cross-validation to select the optimal hyper-parameters for each base classifier
 * Use the training/testing set (generated from step 5) with 10-fold cross-validation to evaluate all possible combinations of base classifiers
 * Calculates average AUC, F1-score, etc across all 10 folds 
 * Select the best combination of base classifiers 
 
-output?????
 
 **7) Predict 450K sites and WGBS sites for each trait**
 
@@ -208,34 +208,39 @@ We use the selected ensemble model from step 6 to make predictions on CpG sites 
 
 
 ``` 
-WGBS_prediction.py ${selected_features.h5} ${all_features_0_2000000.h5} ${all_450k_features.h5}???
+WGBS_prediction.py ${selected_features.h5} ${all_features_0_2000000.h5} ${all_450k_features.h5}
 ```
 
-In this step, we first retrain the base classifiers in the ensemble model using the entire experimental set to obtain the optimal parameters, then we predict the probabilities of 450K sites/WGBS sites being positive. CpG sites are ranked in descendig orders of these probabilities and top 500 sites are selected as candidates for experimental validation. 
+In this step, we need to retrain the base classifiers in the ensemble model with the entire experimental set to obtain the optimal hyper-parameters and save the retrained model. However if the retrain process has already been done, we load the saved retrained model directly. Subsequently we use the retrained model to predict the probabilities of 450K sites/WGBS sites being positive. CpG sites are ranked in descendig orders of these probabilities and top 500 sites are selected as candidates for experimental validation. 
 
-This step generates 2 CSV files for each trait:
+This step generates 2 CSV files and a HDF5 file for each trait:
 
 1)`pred_positive_500.csv`, which contains the top 500 sites and their probabilities of being positive; 
 
-2)`top500_nearest_450k.csv`, which contains the 450K sites within 5k up/downstream of top 500 predicted sites with their CpG ID and genomic location.
+2)`top500_nearest_450k.csv`, which contains the 450K sites within 5k up/downstream of top 500 predicted sites with their CpG ID and genomic location;
 
-and a HDF5 file `pred_probs_450k`, which contains all 450K sites and their probabilities of being positive. 
+3)`pred_probs`, which all WGBS sites and their probabilities of being positive; 
+
+a HDF5 file `pred_probs_450k`, which contains all 450K sites and their probabilities of being positive,
+
+and the saved retrained model `prediction_model.pkl`.
 
 **8) Combine results for all AD traits**
 
-Since we have 7 models trained from datasets of 7 traits, we take both the average and the weighted average of the 7 predicted probabilities as the predicted probability of a CpG site being AD-associated.
+Since we have 7 models trained from datasets of 7 traits, we take both the average and the weighted average of the 7 predicted probabilities as the predicted probability of a CpG site being AD-associated. The weights for each trait is determined based on the F1 score. 
 
 The above process can be achieved by running [WGBS_alltraits_prediction_AD.py](https://github.com/xsun28/CpGMethylation/blob/master/code/prediction/WGBS_alltraits_prediction_AD.py) script available in the [prediction](https://github.com/xsun28/CpGMethylation/tree/master/code/prediction) directory.
 
 ``` 
-WGBS_alltraits_prediction_AD.py ?????
+WGBS_alltraits_prediction_AD.py ${10fold_test_results.pkl} ${pred_probs.h5} ${pred_probs_450k} ${tss.txt}
 ```
+The file `${10fold_test_results.pkl}` is an intermediate output from step 6), which contains F1 score of the ensemble model for each trait. 
 
 This step generates 2 csv files for WGBS sites:
 
-1)`common_top500_mean_nearest_450k.csv`, which contains the top 500 sites with highest unweighted average of 7 probabilities; 
+1)`common_top500_mean_nearest_450k.csv`, which contains the top 500 sites with highest unweighted average of 7 probabilities, and their distances to the nearest tss; 
 
-2)`common_top500_weighted_nearest_450k.csv`,  which contains the top 500 sites with highest weighted average of 7 probabilities
+2)`common_top500_weighted_nearest_450k.csv`,  which contains the top 500 sites with highest weighted average of 7 probabilities, and their distances to the nearest tss; 
 
 and a csv file for 450K sites:
 `450kwithpredictedprob.csv`, which contains the unweighted and weighted average of 7 probabilities of all 450K sites. 
