@@ -2,8 +2,9 @@
 This repository contains all components of the pipeline for predicting novel Alzheimer's Diseasr (AD)-associated CpG sites across the human genome, including experimental set construction, features collection/processing, features selection and ensemble learning, for each of the AD-associated trait of interest. 
 
 ## Tools
-* Python 3.5
-* R 3.5
+* Python 3.6
+* R 3.4
+* Amazon Elastic Compute Cloud (AWC EC2)
 
 ## Prerequites
 The following input files are needed:
