@@ -55,6 +55,7 @@ The features are processed as follows:
 * RNA-sequencing amd ATAC-sequencing readcounts data are assigned to each site by matching window ID
 * Distance to the nearest tss are found for each site
 * Summary of all features 
+
   | Feature source         | Number   | 
   | -------------          |:--------:| 
   | REMC DNase             | 73       |
