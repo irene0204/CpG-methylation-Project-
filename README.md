@@ -216,7 +216,7 @@ WGBS_prediction.py ${selected_features.h5} ${all_features_0_2000000.h5} ${all_45
 
 In this step, we need to retrain the base classifiers in the ensemble model with the entire experimental set to obtain the optimal hyper-parameters and save the retrained model. However if the retrain process has already been done, we load the saved retrained model directly. Subsequently we use the retrained model to predict the probabilities of 450K sites/WGBS sites being positive. CpG sites are ranked in descendig orders of these probabilities and top 500 sites are selected as candidates for experimental validation. 
 
-This step generates 2 CSV files and a HDF5 file for each trait:
+This step generates 2 CSV files, a HDF5 file and a pkl file for each trait:
 
 1)`pred_positive_500.csv`, which contains the top 500 sites and their probabilities of being positive; 
 
@@ -224,9 +224,10 @@ This step generates 2 CSV files and a HDF5 file for each trait:
 
 3)`pred_probs`, which all WGBS sites and their probabilities of being positive; 
 
-a HDF5 file `pred_probs_450k`, which contains all 450K sites and their probabilities of being positive,
+4)the saved retrained model in `prediction_model.pkl`;
 
-and the saved retrained model `prediction_model.pkl`.
+and a HDF5 file `pred_probs_450k`, which contains all 450K sites and their probabilities of being positive,
+
 
 **8) Combine results for all AD traits**
 
