@@ -1,5 +1,5 @@
-# CpG site methylation prediction project pipeline 
-This repository contains all components of the pipeline for predicting novel Alzheimer's Diseasr (AD)-associated CpG sites across the human genome, including experimental set construction, features collection/processing, features selection and ensemble learning, for each of the AD-associated trait of interest. 
+# Alzheimer's Disease-related CpG sites prediction project pipeline 
+This repository contains all components of the pipeline for predicting novel Alzheimer's Disease (AD)-associated CpG sites beyond 450K array across the whole human genome, including experimental set construction, features collection/processing, features selection and ensemble learning, for each of the AD-associated trait of interest. 
 
 ## Tools
 * Python 3.6
@@ -241,7 +241,7 @@ WGBS_alltraits_prediction_AD.py ${10fold_test_results.pkl} ${pred_probs.h5} \
 ```
 The file `${10fold_test_results.pkl}` is an intermediate output from step 6), which contains F1 score of the ensemble model for each trait. 
 
-This step generates 2 csv files for WGBS sites:
+This step generates 2 CSV files for WGBS sites:
 
 1)`common_top500_mean_nearest_450k.csv`, which contains the top 500 sites with highest unweighted average of 7 probabilities, and their distances to the nearest tss; 
 
