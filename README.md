@@ -84,7 +84,7 @@ The features are processed as follows:
 
 This step generates HDF5 files for all batches of WGBS sites and their feature values:
 ``` 
-all_features_0_2000000
+all_features_0_2000000.h5
 ....
 ```
 
@@ -99,7 +99,7 @@ all450k_feature_preprocess.py ${all_450k_sites_winid.csv} ${DIVAN_features.bed} 
 ```
 This step generates a HDF5 file for 450K sites and their feature values:
 ``` 
-all_450k_features
+all_450k_features.h5
 ```
 
 **3) Experimental set construction for each trait**
@@ -137,7 +137,7 @@ and 1 CSV file for all 450K sites:
 ``` 
 all_450k_sites_winid.csv
 ```
-which contains all 450k sites with with columns: CpG ID, chromosome, coordinate, p-value, β-value and window ID. 
+which contains all 450k sites with columns: CpG ID, chromosome, coordinate, p-value, β-value and window ID. 
 
 
 **4) Assign feature values to the experimental set for each trait**
@@ -153,7 +153,7 @@ all_features_preprocess.py ${all_sites_winid.csv} ${DIVAN_features.bed} ${CADD.t
 
 This step generates 7 HDF5 files for 7 traits:
 ``` 
-all_features
+all_features.h5
 ```
 which contains all feature values of the experimental set for each trait.
 
@@ -177,17 +177,11 @@ The features are selected as follows for each trait:
 * From top to bottom, sort selected features first by desceding n and then by ascending p-value 
 * Select top ranked features for each trait 
 
-This step outputs a CSV file:
-``` 
-feature_stats.csv 
-```
-which contains information of the top ranked feaures, including feature name, p-value, and n
+This step outputs a CSV file and a HDF5 file for each trait:
 
-and a HDF5 file:
-``` 
-selected_features 
-```
-which contains the training and testing set with the values of top ranked features assigned and the labels for training and testing set.
+1)`feature_stats.csv`, which contains information of the top ranked feaures, including feature name, p-value, and n
+
+2)`selected_features.h5`, which contains the training and testing set with the values of top ranked features assigned and the labels for training and testing set.
 
 **6) Model hyper-parameters tuning and model selection for each trait**
 
@@ -222,11 +216,11 @@ This step generates 2 CSV files, a HDF5 file and a pkl file for each trait:
 
 2)`top500_nearest_450k.csv`, which contains the 450K sites within 5k up/downstream of top 500 predicted sites with their CpG ID and genomic location;
 
-3)`pred_probs`, which all WGBS sites and their probabilities of being positive; 
+3)`pred_probs.h5`, which all WGBS sites and their probabilities of being positive; 
 
 4)the saved retrained model in `prediction_model.pkl`;
 
-and a HDF5 file `pred_probs_450k`, which contains all 450K sites and their probabilities of being positive,
+and a HDF5 file `pred_probs_450k.h5`, which contains all 450K sites and their probabilities of being positive,
 
 
 **8) Combine results for all AD traits**
