@@ -88,7 +88,7 @@ all_features_0_2000000
 ....
 ```
 
-**2) Assign features to all 450K sites**
+**2) Assign feature values to all 450K sites**
 
 By running the [all450k_feature_preprocess.py](https://github.com/xsun28/CpGMethylation/blob/master/code/features_preprocess/all450k_feature_preprocess.py) script in the [features_proprocess](https://github.com/xsun28/CpGMethylation/tree/master/code/features_preprocess) directory, we assign all (2256) feature values to 450K sites.
 
@@ -189,7 +189,7 @@ selected_features
 ```
 which contains the training and testing set with the values of top ranked features assigned and the labels for training and testing set.
 
-**6) Model parameter tuning and model selection for each trait**
+**6) Model hyper-parameters tuning and model selection for each trait**
 
 We use 4 base classifiers, random forest, xgboost, logistic regression with L2-regularization and SVC with linear kernel.The optimal  hyper-paramters for each classifier and best combination of base classifiers are selected by running the [ModelSelectionTuning.py](https://github.com/xsun28/CpGMethylation/blob/master/code/models/ModelSelectionTuning.py) script available in the [models](https://github.com/xsun28/CpGMethylation/tree/master/code/models) directory.
 
