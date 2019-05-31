@@ -18,7 +18,7 @@ The following input files are needed:
 * BED files with window IDs of WGBS sites and RNA-sequencing read counts data `RNASEQ.bed`
 * BED files with window IDs of WGBS sites and ATAC-sequencing read counts data `ATACSEQ.bed`
 * BED files with genomic locations of WGBS sites and WGBS read counts data `wgbs_readcounts.bed`
-* TXT files with genomic locations of transcription start sites (tss) `tss.txt`
+* a TXT file with genomic locations of transcription start sites (tss) `tss.txt`
 
 
 
