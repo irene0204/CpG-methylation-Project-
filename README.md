@@ -54,7 +54,7 @@ The features are processed as follows:
 
 * 1806 features in the DIVAN study are constructed to cover the entire human genome in 200 base-pair resolution and assigned to each site by matching the window ID
 * CADD, DANN, EIGEN, GenoCanyon and GWAVA scores are assigned to each site by matching genomic location
-* RNA-sequencing amd ATAC-sequencing readcounts data are assigned to each site by matching window ID
+* RNA-sequencing, ATAC-sequencing and WGBS readcounts data are assigned to each site by matching window ID
 * Distance to the nearest tss are found for each site
 * Summary of all features 
 
